@@ -8,7 +8,7 @@ var types = {
 };
 
 exports.app = function(req, type) {
-    type = type.replace(".", "");
+    type = (type || "").replace(".", "");
     if (!(type in types)) {
         type = "html";
     }
