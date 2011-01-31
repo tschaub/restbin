@@ -1,7 +1,8 @@
 var Response = require("ringo/webapp/response").Response;
 
 exports.urls = [
-    [(/^\/request(\.\w+)?/), require("./request").app],
+    [(/^\/(paste)(\.\w+)?/), require("./request").app],
+    [(/^\/(request)(\.\w+)?/), require("./request").app],
     ["/", function() {
         return Response.skin(module.resolve("skins/index.html"), {
             title: "restbin"

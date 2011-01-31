@@ -1,5 +1,6 @@
 var Request = require("ringo/webapp/request").Request;
 var Response = require("ringo/webapp/response").Response;
+var paste = require("./paste").paste;
 
 var types = {
     json: "application/json",
@@ -7,7 +8,7 @@ var types = {
     txt: "text/plain"
 };
 
-exports.app = function(req, type) {
+exports.app = function(req, action, type) {
     type = (type || "").replace(".", "");
     if (!(type in types)) {
         type = "html";
@@ -24,16 +25,33 @@ exports.app = function(req, type) {
     };
     
     var response;
-    if (type === "html") {
-        return Response.skin(module.resolve("skins/request.html"), {
-            details: JSON.stringify(details)
-        });
+    if (action === "paste") {
+        var href = paste(JSON.stringify(details));
+        if (type === "html") {
+            response = {
+                status: 302,
+                headers: {"Location": href},
+                body: []
+            };
+        } else {
+            response = {
+                status: 200,
+                headers: {"Content-Type": types[type]},
+                body: [JSON.stringify({href: href})]
+            };
+        }
     } else {
-        response = {
-            status: 200,
-            headers: {"Content-Type": types[type]},
-            body: [JSON.stringify(details)]
-        };
+        if (type === "html") {
+            response = Response.skin(module.resolve("skins/request.html"), {
+                details: JSON.stringify(details)
+            });
+        } else {
+            response = {
+                status: 200,
+                headers: {"Content-Type": types[type]},
+                body: [JSON.stringify(details)]
+            };
+        }
     }
     return response;
 };
